@@ -1,6 +1,11 @@
+from datetime import datetime
 from typing import NoReturn
 
+import yfinance as yf
 from PIL.Image import Image
+
+now = datetime.now()
+current_time = now.strftime("%H:%M:%S")
 
 
 def add_margin(img, top, left, bottom, right, color):
@@ -28,3 +33,23 @@ def conv_to_size(path, path_to_save=NoReturn):
         res.save(path_to_save)
     else:
         res.save(path)
+
+
+tickers = [
+    ("^GSPC", "s&p500"),
+    ("aapl", "aapl"),
+    ("msft", "msft"),
+    ("goog", "googl"),
+    ("amzn", "amzn"),
+    ("tsla", "tsla"),
+    ("BTC-USD", "btc"),
+    ("ETH-USD", "eth"),
+]
+
+
+def ret_change(ticker):
+    x = yf.Ticker(ticker)
+    z = x.history(period="3d")
+    return (
+        ((z.iloc[-1]["Close"] - z.iloc[-2]["Close"]) / z.iloc[-2]["Close"]) * 100
+    ).round(2), z.iloc[-1]["Close"].round(2)
