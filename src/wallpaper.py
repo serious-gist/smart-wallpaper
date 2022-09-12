@@ -1,3 +1,5 @@
+import glob
+import pathlib
 from datetime import datetime
 from typing import NoReturn
 
@@ -17,22 +19,28 @@ def add_margin(img, top, left, bottom, right, color):
     return result
 
 
-def conv_to_size(path, path_to_save=NoReturn):
-    z = Image.open(path)
-    if z.size[0] / 1920 > z.size[1] / 1080:
-        vres = z.size[0] * 1080 / 1920
-        vres = vres - z.size[1]
-        vres = int(vres / 2)
-        res = add_margin(z, vres, 0, vres, 0, (0, 0, 0))
-    else:
-        hres = z.size[1] * 1920 / 1080
-        hres = hres - z.size[0]
-        hres = int(hres / 2)
-        res = add_margin(z, 0, hres, 0, hres, (0, 0, 0))
-    if path_to_save is not None:
-        res.save(path_to_save)
-    else:
-        res.save(path)
+def conv_to_size(path_to_save=NoReturn):
+    image_dir = glob.glob("/*.png")
+
+    for image in image_dir:
+        image = Image.open(image)
+        if image.size[0] / 1920 > image.size[1] / 1080:
+            vertical_resolution = image.size[0] * 1080 / 1920
+            vertical_resolution = vertical_resolution - image.size[1]
+            vertical_resolution = int(vertical_resolution / 2)
+            resolution = add_margin(
+                image, vertical_resolution, 0, vertical_resolution, 0, (0, 0, 0)
+            )
+        else:
+            horizontal_resolution = image.size[1] * 1920 / 1080
+            horizontal_resolution = horizontal_resolution - image.size[0]
+            horizontal_resolution = int(horizontal_resolution / 2)
+            resolution = add_margin(
+                image, 0, horizontal_resolution, 0, horizontal_resolution, (0, 0, 0)
+            )
+        resolution.save(path_to_save) if path_to_save is not None else resolution.save(
+            image_dir
+        )
 
 
 tickers = [
